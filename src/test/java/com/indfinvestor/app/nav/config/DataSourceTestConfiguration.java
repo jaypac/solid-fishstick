@@ -1,0 +1,32 @@
+package com.indfinvestor.app.nav.config;
+
+import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
+
+import javax.sql.DataSource;
+import org.springframework.boot.autoconfigure.batch.BatchDataSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+
+@Configuration
+public class DataSourceTestConfiguration {
+
+    @Bean
+    @BatchDataSource
+    public DataSource dataSource() {
+        return new EmbeddedDatabaseBuilder()
+                .setType(H2)
+                .addScript("/db/migration/h2/V1__Create_event_publication_table.sql")
+                .addScript("/db/migration/h2/V2__Create_spring_batch_tables.sql")
+                .addScript("/db/migration/h2/V3__Create_mf_tables.sql")
+                .addScript("/db/migration/h2/V4__Insert_mf_fund_house_data.sql")
+                .generateUniqueName(true)
+                .build();
+    }
+
+    @Bean
+    public JdbcTransactionManager transactionManager(DataSource dataSource) {
+        return new JdbcTransactionManager(dataSource);
+    }
+}
