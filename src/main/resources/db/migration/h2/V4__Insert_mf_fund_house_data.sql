@@ -6,6 +6,7 @@ VALUES ('360 ONE Mutual Fund'),
        ('Bandhan Mutual Fund'),
        ('Bank of India Mutual Fund'),
        ('Baroda BNP Paribas Mutual Fund'),
+       ('Benchmark Mutual Fund'),
        ('Canara Robeco Mutual Fund'),
        ('DSP Mutual Fund'),
        ('Edelweiss Mutual Fund'),
@@ -36,5 +37,6 @@ VALUES ('360 ONE Mutual Fund'),
        ('Taurus Mutual Fund'),
        ('Union Mutual Fund'),
        ('UTI Mutual Fund'),
-       ('WhiteOak Capital Mutual Fund');
+       ('WhiteOak Capital Mutual Fund'),
+       ('Zerodha Mutual Fund');
 	

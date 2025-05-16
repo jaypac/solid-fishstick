@@ -2,6 +2,8 @@ package com.indfinvestor.app.nav.amfi;
 
 import com.indfinvestor.app.nav.amfi.bulkload.config.AmfiBulkFileNavTransformerJobConfig;
 import com.indfinvestor.app.nav.config.JobSetupTestConfiguration;
+import com.indfinvestor.app.nav.model.entity.MfSchemeNav;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringJUnitConfig({JobSetupTestConfiguration.class, AmfiBulkFileNavTransformerJobConfig.class})
 @SpringBatchTest
@@ -27,6 +31,9 @@ class AmfiBulkLoadJobConfigTest {
 
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     public void setup(@Autowired Job jobUnderTest) {
@@ -47,6 +54,8 @@ class AmfiBulkLoadJobConfigTest {
         JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
 
         // then
-        Assertions.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+        assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+        var mfSchemenav = entityManager.find(MfSchemeNav.class, 10L);
+        assertEquals(10L, mfSchemenav.getId());
     }
 }

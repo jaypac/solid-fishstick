@@ -2,6 +2,11 @@ package com.indfinvestor.app.nav.contants;
 
 public enum SchemeSubCategory {
     MULTI_CAP("Multi Cap Fund"),
+    GROWTH_OTHER("Growth"),
+    GILT_OTHER("Gilt"),
+    LIQUID_OTHER("Liquid"),
+    BALANCED_OTHER("Balanced"),
+    DOMESTIC_OTHER("Domestic"),
     FLEXI_CAP("Flexi Cap Fund"),
     LARGE_CAP("Large Cap Fund"),
     LARGE_AND_MID_CAP("Large & Mid Cap Fund"),
@@ -14,6 +19,7 @@ public enum SchemeSubCategory {
     ELSS("ELSS"),
     OVERNIGHT("Overnight Fund"),
     LIQUID("Liquid Fund"),
+    FLOATING_RATE("Floating Rate"),
     ULTRA_SHORT_DURATION("Ultra Short Duration Fund"),
     LOW_DURATION("Low Duration Fund"),
     MONEY_MARKET("Money Market Fund"),
@@ -29,16 +35,22 @@ public enum SchemeSubCategory {
     FLOATER("Floater Fund"),
     CONSERVATIVE_HYBRID("Conservative Hybrid Fund"),
     AGGRESSIVE_HYBRID("Aggressive Hybrid Fund"),
+    BALANCED_HYBRID("Balanced Hybrid Fund"),
     DYNAMIC_ASSET_ALLOCATION_BALANCED_ADVANTAGE("Dynamic Asset Allocation or Balanced Advantage"),
     MULTI_ASSET("Multi Asset Allocation"),
     ARBITRAGE("Arbitrage Fund"),
     EQUITY_SAVINGS("Equity Savings"),
     RETIREMENT("Retirement Fund"),
-    CHILDRENS("Childrens Fund"),
+    OVERSEAS("Overseas"),
+    CONTRA("Contra Fund"),
     INDEX("Index Funds"),
     GOLD_ETF("Gold ETF"),
     OTHER_ETS("Other ETFs"),
     FOF_OVERSEAS("FoF Overseas"),
+    FOF_DOMESTIC("FoF Domestic"),
+    INCOME("Income"),
+    CHILDRENS("Childrens Fund"),
+    GILT_FUND_10_YEAR("Gilt Fund with 10 year constant duration"),
     UNCLASSIFIED("Unclassified");
 
     private final String name;
@@ -49,5 +61,15 @@ public enum SchemeSubCategory {
 
     public String getName() {
         return name;
+    }
+
+    public static SchemeSubCategory fromName(String name) {
+        var categoryName = name.replace("/ ", "/").replace("  "," ").replace("’s","s").trim();
+        for (SchemeSubCategory category : values()) {
+            if (category.getName().equalsIgnoreCase(categoryName)) {
+                return category;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant for name: " + name);
     }
 }

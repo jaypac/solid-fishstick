@@ -2,6 +2,7 @@ package com.indfinvestor.app.nav.amfi.bulkload;
 
 import com.indfinvestor.app.nav.model.dto.MfNavDetails;
 import com.indfinvestor.app.nav.model.dto.MfNavRecord;
+import com.indfinvestor.app.nav.model.dto.MfSchemeDetailsRecord;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class AmfiFileItemReader implements ItemReader<MfNavDetails> {
 
         MfNavDetails mfNavDetails = new MfNavDetails();
 
-        var result = new HashMap<String, List<MfNavRecord>>();
+        var result = new HashMap<MfSchemeDetailsRecord, List<MfNavRecord>>();
         var category = "";
         var subCategory = "";
         var content = FileUtils.readFileToString(new File(fileName), encoding);
@@ -62,15 +63,15 @@ public class AmfiFileItemReader implements ItemReader<MfNavDetails> {
                     if (m.find()) {
                         var extracted = m.group(1);
                         var split = extracted.split("-");
-                        log.info("Split {}", split);
+                        log.debug("Split {}", split);
                         if (split.length == 1) {
                             category = "Other";
                             subCategory = split[0].trim();
-                            log.info("Category:{} subCategory:{}", category, subCategory);
+                            log.debug("Category:{} subCategory:{}", category, subCategory);
                         } else {
                             category = split[0].trim();
                             subCategory = split[1].trim();
-                            log.info("Category:{} subCategory:{}", category, subCategory);
+                            log.debug("Category:{} subCategory:{}", category, subCategory);
                         }
                     }
                 }
@@ -83,7 +84,7 @@ public class AmfiFileItemReader implements ItemReader<MfNavDetails> {
                         var navDate = LocalDate.parse(splitRow[7], formatter);
                         var schemeCode = splitRow[0].trim();
                         var schemeName = splitRow[1].trim();
-
+                        var key = new MfSchemeDetailsRecord(schemeCode, schemeName, category, subCategory);
                         if ((schemeName.toUpperCase().contains("GROWTH")
                                         && !schemeName.toUpperCase().contains("INSTITUTIONAL"))
                                 || schemeName.contains("Reliance")) {
@@ -92,17 +93,17 @@ public class AmfiFileItemReader implements ItemReader<MfNavDetails> {
                             if (NumberUtils.isParsable(nav)) {
                                 var record =
                                         new MfNavRecord(schemeCode, schemeName, nav, navDate, category, subCategory);
-                                if (result.containsKey(schemeName)) {
-                                    var navRecords = result.get(schemeName);
+                                if (result.containsKey(key)) {
+                                    var navRecords = result.get(key);
                                     navRecords.add(record);
                                 } else {
                                     var navRecords = new ArrayList<>(List.of(record));
-                                    result.put(schemeName, navRecords);
+                                    result.put(key, navRecords);
                                 }
                             }
                         }
                     } else if (line.endsWith(MUTUAL_FUND)) {
-                        mfNavDetails.setFundHouse(line.replace(MUTUAL_FUND, "").trim());
+                        mfNavDetails.setFundHouse(line.trim());
                     }
                 }
             }
@@ -112,7 +113,6 @@ public class AmfiFileItemReader implements ItemReader<MfNavDetails> {
             throw new RuntimeException(e);
         }
 
-        result.forEach((k, v) -> v.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate())));
         mfNavDetails.setHistoricalNavData(result);
         noInput = true;
         return mfNavDetails;

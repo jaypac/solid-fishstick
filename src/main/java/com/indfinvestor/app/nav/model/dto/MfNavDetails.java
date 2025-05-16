@@ -11,7 +11,7 @@ import lombok.Setter;
 public class MfNavDetails {
     @NotBlank private String fundHouse;
 
-    private Map<String, List<MfNavRecord>> historicalNavData;
+    private Map<MfSchemeDetailsRecord, List<MfNavRecord>> historicalNavData;
 
     @Override
     public boolean equals(Object o) {
