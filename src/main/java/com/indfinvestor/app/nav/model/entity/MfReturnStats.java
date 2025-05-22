@@ -12,8 +12,7 @@ import lombok.Setter;
 public class MfReturnStats {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mf_return_stats_seq")
-    @SequenceGenerator(name = "mf_return_stats_seq", sequenceName = "MF_RETURN_STATS_SEQ", allocationSize = 100)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "YEAR_NOS", nullable = false)

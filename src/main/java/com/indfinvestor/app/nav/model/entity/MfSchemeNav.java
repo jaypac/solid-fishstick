@@ -13,8 +13,7 @@ import lombok.Setter;
 public class MfSchemeNav {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mf_scheme_nav_seq")
-    @SequenceGenerator(name = "mf_scheme_nav_seq", sequenceName = "MF_SCHEME_NAV_SEQ", allocationSize = 50)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "NAV_DATE", nullable = false)

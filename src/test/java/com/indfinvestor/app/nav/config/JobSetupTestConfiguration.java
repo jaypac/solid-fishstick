@@ -1,6 +1,7 @@
 package com.indfinvestor.app.nav.config;
 
 import jakarta.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,8 +13,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager;
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitManager;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-
-import javax.sql.DataSource;
 
 @Configuration
 @Import(DataSourceTestConfiguration.class)

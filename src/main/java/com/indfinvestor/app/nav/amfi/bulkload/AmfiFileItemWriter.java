@@ -7,17 +7,23 @@ import com.indfinvestor.app.nav.model.dto.MfNavRecord;
 import com.indfinvestor.app.nav.model.dto.MfSchemeDetailsRecord;
 import com.indfinvestor.app.nav.model.entity.MfFundHouse;
 import com.indfinvestor.app.nav.model.entity.MfSchemeDetails;
-import com.indfinvestor.app.nav.model.entity.MfSchemeNav;
 import com.indfinvestor.app.nav.service.MfFundHouseService;
 import com.indfinvestor.app.nav.service.MfSchemeDetailsService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+
+import java.math.BigDecimal;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,12 +32,14 @@ public class AmfiFileItemWriter implements ItemWriter<MfNavDetails> {
     private final MfFundHouseService fundHouseService;
     private final MfSchemeDetailsService mfSchemeDetailsService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Value("${scheme.details.writer.insert}")
+    private String schemeMfNavDetailsInsert;
+
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     private void convertToEntity(MfNavDetails newMfNavDetails) {
         MfFundHouse mfFundHouse = fundHouseService.getFundHouseByName(newMfNavDetails.getFundHouse());
-        if(mfFundHouse == null){
+        if (mfFundHouse == null) {
             log.error("Fund House not found for name {}", newMfNavDetails.getFundHouse());
             throw new RuntimeException("Fund House not found");
         }
@@ -53,19 +61,37 @@ public class AmfiFileItemWriter implements ItemWriter<MfNavDetails> {
                 schemeDetails.setSubCategory(SchemeSubCategory.fromName(key.subCategory()));
                 schemeDetails.setFundHouse(mfFundHouse);
             }
-            entityManager.persist(schemeDetails);
+            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getJdbcTemplate())
+                    .withTableName("mf_scheme_details")
+                    .usingGeneratedKeyColumns("id");
 
-            for (MfNavRecord navRecord : navRecords) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("scheme_code", schemeDetails.getSchemeCode());
+            parameters.put("scheme_name", schemeDetails.getSchemeName());
+            parameters.put("category", schemeDetails.getCategory().name());
+            parameters.put("sub_category", schemeDetails.getSubCategory().name());
+            parameters.put("fund_house_id", schemeDetails.getFundHouse().getId());
 
-                MfSchemeNav mfSchemeNav = new MfSchemeNav();
-                mfSchemeNav.setNavDate(navRecord.getDate());
-                mfSchemeNav.setNetAssetValue(new BigDecimal(navRecord.getNav()));
-                mfSchemeNav.setSchemeDetails(schemeDetails);
-                entityManager.persist(mfSchemeNav);
+            Number returnKey = jdbcInsert.executeAndReturnKey(parameters);
+            var schemeId = returnKey.longValue();
+
+
+            List<MapSqlParameterSource> entries = new ArrayList<>();
+            for (MfNavRecord record : navRecords) {
+                MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource()
+                        .addValue("navDate", record.getDate(), Types.DATE)
+                        .addValue("netAssetValue", new BigDecimal(record.getNav()), Types.NUMERIC)
+                        .addValue("schemeId", schemeId, Types.BIGINT);
+                entries.add(mapSqlParameterSource);
             }
+            MapSqlParameterSource[] array = entries.toArray(new MapSqlParameterSource[entries.size()]);
+            jdbcTemplate.batchUpdate(schemeMfNavDetailsInsert, array);
         }
 
-        log.info("Finished writing records for fund {} in {} ms", mfFundHouse.getName(), System.currentTimeMillis() - startTime);
+        log.info(
+                "Finished writing records for fund {} in {} ms",
+                mfFundHouse.getName(),
+                System.currentTimeMillis() - startTime);
     }
 
     @Override

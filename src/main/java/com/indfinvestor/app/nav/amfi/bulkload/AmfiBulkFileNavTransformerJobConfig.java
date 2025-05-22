@@ -1,12 +1,9 @@
-package com.indfinvestor.app.nav.amfi.bulkload.config;
+package com.indfinvestor.app.nav.amfi.bulkload;
 
-import com.indfinvestor.app.nav.amfi.bulkload.AmfiFileItemProcessor;
-import com.indfinvestor.app.nav.amfi.bulkload.AmfiFileItemReader;
-import com.indfinvestor.app.nav.amfi.bulkload.AmfiFileItemWriter;
-import com.indfinvestor.app.nav.amfi.bulkload.AmfiFilePartitioner;
 import com.indfinvestor.app.nav.model.dto.MfNavDetails;
 import com.indfinvestor.app.nav.service.MfFundHouseService;
 import com.indfinvestor.app.nav.service.MfSchemeDetailsService;
+import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -23,9 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.orm.jpa.JpaTransactionManager;
-
-import java.nio.charset.StandardCharsets;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Slf4j
 @Configuration
@@ -33,13 +29,13 @@ public class AmfiBulkFileNavTransformerJobConfig {
 
     @Bean(name = "amfiFilePartitioner")
     @StepScope
-    public Partitioner getPartitioner(@Value("#{jobParameters['filePath']}") String inputPath) {
+    public Partitioner getPartitioner(final @Value("#{jobParameters['filePath']}") String inputPath) {
         return new AmfiFilePartitioner(inputPath);
     }
 
     @Bean(name = "amfiFileItemReader")
     @StepScope
-    public ItemReader<MfNavDetails> itemReader(@Value("#{stepExecutionContext['fileName']}") String fileName) {
+    public ItemReader<MfNavDetails> itemReader(final @Value("#{stepExecutionContext['fileName']}") String fileName) {
         log.info("Reading file {}", fileName);
         return new AmfiFileItemReader("itemReader", fileName, StandardCharsets.UTF_8);
     }
@@ -61,23 +57,24 @@ public class AmfiBulkFileNavTransformerJobConfig {
     @Bean(name = "amfiFileItemWriter")
     @StepScope
     public AmfiFileItemWriter getItemWriter(
-            MfFundHouseService fundHouseService, MfSchemeDetailsService mfSchemeDetailsService) {
-
-        return new AmfiFileItemWriter(fundHouseService, mfSchemeDetailsService);
+            final MfFundHouseService fundHouseService,
+            final MfSchemeDetailsService mfSchemeDetailsService,
+            final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        return new AmfiFileItemWriter(fundHouseService, mfSchemeDetailsService, namedParameterJdbcTemplate);
     }
 
     @Bean(name = "amfiBulkFileNavTransformerJob")
     public Job job(
-            JobRepository jobRepository,
-            JpaTransactionManager jpaTransactionManager,
-            @Qualifier("amfiFileItemReader") ItemReader<MfNavDetails> itemReader,
-            @Qualifier("amfiFileItemProcessor") ItemProcessor<MfNavDetails, MfNavDetails> itemProcessor,
-            @Qualifier("amfiFileItemWriter") ItemWriter<MfNavDetails> itemWriter,
-            @Qualifier("amfiFilePartitioner") Partitioner partitioner)
+            final JobRepository jobRepository,
+            final JdbcTransactionManager jdbcTransactionManager,
+            final @Qualifier("amfiFileItemReader") ItemReader<MfNavDetails> itemReader,
+            final @Qualifier("amfiFileItemProcessor") ItemProcessor<MfNavDetails, MfNavDetails> itemProcessor,
+            final @Qualifier("amfiFileItemWriter") ItemWriter<MfNavDetails> itemWriter,
+            final @Qualifier("amfiFilePartitioner") Partitioner partitioner)
             throws Exception {
 
         var step1 = new StepBuilder("step1", jobRepository)
-                .<MfNavDetails, MfNavDetails>chunk(5, jpaTransactionManager)
+                .<MfNavDetails, MfNavDetails>chunk(5, jdbcTransactionManager)
                 .reader(itemReader)
                 .processor(itemValidator())
                 .processor(itemProcessor)

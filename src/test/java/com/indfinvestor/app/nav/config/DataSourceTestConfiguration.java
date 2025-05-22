@@ -17,10 +17,10 @@ public class DataSourceTestConfiguration {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(H2)
-                .addScript("/db/migration/h2/V1__Create_event_publication_table.sql")
-                .addScript("/db/migration/h2/V2__Create_spring_batch_tables.sql")
-                .addScript("/db/migration/h2/V3__Create_mf_tables.sql")
-                .addScript("/db/migration/h2/V4__Insert_mf_fund_house_data.sql")
+                .addScript("/db/h2/migration/V1__Create_event_publication_table.sql")
+                .addScript("/db/h2/migration/V2__Create_spring_batch_tables.sql")
+                .addScript("/db/h2/migration/V3__Create_mf_tables.sql")
+                .addScript("/db/h2/migration/V4__Insert_mf_fund_house_data.sql")
                 .generateUniqueName(true)
                 .build();
     }

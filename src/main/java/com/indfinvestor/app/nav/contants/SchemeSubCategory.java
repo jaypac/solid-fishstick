@@ -64,7 +64,8 @@ public enum SchemeSubCategory {
     }
 
     public static SchemeSubCategory fromName(String name) {
-        var categoryName = name.replace("/ ", "/").replace("  "," ").replace("’s","s").trim();
+        var categoryName =
+                name.replace("/ ", "/").replace("  ", " ").replace("’s", "s").trim();
         for (SchemeSubCategory category : values()) {
             if (category.getName().equalsIgnoreCase(categoryName)) {
                 return category;

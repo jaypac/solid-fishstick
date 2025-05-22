@@ -14,8 +14,7 @@ import org.hibernate.annotations.NaturalId;
 public class MfSchemeDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mf_scheme_details_seq")
-    @SequenceGenerator(name = "mf_scheme_details_seq", sequenceName = "MF_SCHEME_DETAILS_SEQ", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NaturalId

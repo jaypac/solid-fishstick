@@ -3,10 +3,6 @@ package com.indfinvestor.app.nav.amfi.bulkload;
 import com.indfinvestor.app.nav.model.dto.MfNavDetails;
 import com.indfinvestor.app.nav.model.dto.MfNavRecord;
 import com.indfinvestor.app.nav.model.dto.MfSchemeDetailsRecord;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.BeanUtils;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.BeanUtils;
 
 @Slf4j
 public class AmfiFileItemProcessor implements ItemProcessor<MfNavDetails, MfNavDetails> {
@@ -25,8 +24,7 @@ public class AmfiFileItemProcessor implements ItemProcessor<MfNavDetails, MfNavD
         newMfNavDetails.setFundHouse(item.getFundHouse());
         log.info("Processing records for fund {}", item.getFundHouse());
         var historicalData = item.getHistoricalNavData();
-        historicalData.forEach((k, v) ->
-                v.sort((o1, o2) -> o1.getDate().compareTo(o2.getDate())));
+        historicalData.forEach((k, v) -> v.sort((o1, o2) -> o1.getDate().compareTo(o2.getDate())));
 
         Map<MfSchemeDetailsRecord, List<MfNavRecord>> historicalNavData = new HashMap<>();
         item.getHistoricalNavData().forEach((key, value) -> {
