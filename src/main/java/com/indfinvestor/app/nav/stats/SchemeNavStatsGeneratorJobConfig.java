@@ -54,14 +54,13 @@ public class SchemeNavStatsGeneratorJobConfig {
         return taskExecutor;
     }
 
-
     @Bean(name = "navStatsGeneratorJob")
     public Job job(
             final JobRepository jobRepository,
             final JdbcTransactionManager jdbcTransactionManager,
             final @Qualifier("schemeNavStatsItemReader") ItemReader<MfSchemeDetailsDto> itemReader,
             final @Qualifier("schemeNavStatsProcessor") ItemProcessor<MfSchemeDetailsDto, MfRollingReturns>
-                    itemProcessor,
+                            itemProcessor,
             final @Qualifier("schemeNavStatsItemWriter") ItemWriter<MfRollingReturns> itemWriter,
             final @Qualifier("schemeNavPartitioner") Partitioner partitioner,
             final @Qualifier("navStatsTaskExecutor") TaskExecutor taskExecutor) {

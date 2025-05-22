@@ -2,11 +2,10 @@ package com.indfinvestor.app.nav.model.dto;
 
 import com.indfinvestor.app.nav.contants.SchemeCategory;
 import com.indfinvestor.app.nav.contants.SchemeSubCategory;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

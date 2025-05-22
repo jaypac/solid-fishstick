@@ -9,6 +9,12 @@ import com.indfinvestor.app.nav.model.entity.MfFundHouse;
 import com.indfinvestor.app.nav.model.entity.MfSchemeDetails;
 import com.indfinvestor.app.nav.service.MfFundHouseService;
 import com.indfinvestor.app.nav.service.MfSchemeDetailsService;
+import java.math.BigDecimal;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -17,13 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-
-import java.math.BigDecimal;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -74,7 +73,6 @@ public class AmfiFileItemWriter implements ItemWriter<MfNavDetails> {
 
             Number returnKey = jdbcInsert.executeAndReturnKey(parameters);
             var schemeId = returnKey.longValue();
-
 
             List<MapSqlParameterSource> entries = new ArrayList<>();
             for (MfNavRecord record : navRecords) {
