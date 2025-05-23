@@ -3,12 +3,15 @@ package com.indfinvestor.app.nav.stats;
 import com.indfinvestor.app.nav.model.dto.MfSchemeDetailsDto;
 import com.indfinvestor.app.nav.model.dto.MfSchemeNavDto;
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.sql.Types;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
-import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Slf4j
@@ -19,12 +22,14 @@ public class SchemeNavStatsItemReader implements ItemReader<MfSchemeDetailsDto> 
 
     private final MfSchemeDetailsDto mfSchemeDetails;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final String startingYear;
     private boolean noInput = false;
 
     public SchemeNavStatsItemReader(
-            MfSchemeDetailsDto mfSchemeDetails, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+            MfSchemeDetailsDto mfSchemeDetails, NamedParameterJdbcTemplate namedParameterJdbcTemplate, String startingYear) {
         this.mfSchemeDetails = mfSchemeDetails;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.startingYear = startingYear;
     }
 
     @Override
@@ -42,12 +47,15 @@ public class SchemeNavStatsItemReader implements ItemReader<MfSchemeDetailsDto> 
     private List<MfSchemeNavDto> findAll(Long schemeId) {
 
         // Create parameter map
-        Map<String, Object> params = new HashMap<>();
-        params.put("schemeId", schemeId);
+        LocalDate firstDayOfYear = LocalDate.of(Integer.parseInt(startingYear), Month.JANUARY, 1);
+
+        MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource()
+                .addValue("schemeId", schemeId, Types.BIGINT)
+                .addValue("startingDate", firstDayOfYear, Types.DATE);
 
         return namedParameterJdbcTemplate.query(
                 schemeNavDetailsQuery,
-                params,
+                mapSqlParameterSource,
                 (rs, rowNum) -> new MfSchemeNavDto(
                         new BigDecimal(rs.getString("netAssetValue")),
                         rs.getDate("navDate").toLocalDate()));

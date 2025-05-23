@@ -29,8 +29,9 @@ public class SchemeNavStatsGeneratorJobConfig {
     @StepScope
     public ItemReader<MfSchemeDetailsDto> itemReader(
             final @Value("#{stepExecutionContext['mfSchemeDetails']}") MfSchemeDetailsDto mfSchemeDetails,
-            final NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        return new SchemeNavStatsItemReader(mfSchemeDetails, namedParameterJdbcTemplate);
+            final NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            final @Value("#{jobParameters['startingYear']}") String startingYear) {
+        return new SchemeNavStatsItemReader(mfSchemeDetails, namedParameterJdbcTemplate , startingYear);
     }
 
     @Bean(name = "schemeNavStatsProcessor")

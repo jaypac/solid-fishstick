@@ -17,7 +17,7 @@ public class VendorSqlEnvironmentPostProcessor implements EnvironmentPostProcess
 
         if (vendor != null) {
             try {
-                Resource resource = new ClassPathResource("db/" + vendor + "/sql.properties");
+                Resource resource = new ClassPathResource("db/" + vendor + "/sql/batch.properties");
                 if (resource.exists()) {
                     PropertySource<?> propertySource = new ResourcePropertySource(resource);
                     environment.getPropertySources().addLast(propertySource);
