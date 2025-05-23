@@ -31,7 +31,7 @@ public class SchemeNavStatsGeneratorJobConfig {
             final @Value("#{stepExecutionContext['mfSchemeDetails']}") MfSchemeDetailsDto mfSchemeDetails,
             final NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             final @Value("#{jobParameters['startingYear']}") String startingYear) {
-        return new SchemeNavStatsItemReader(mfSchemeDetails, namedParameterJdbcTemplate , startingYear);
+        return new SchemeNavStatsItemReader(mfSchemeDetails, namedParameterJdbcTemplate, startingYear);
     }
 
     @Bean(name = "schemeNavStatsProcessor")

@@ -7,7 +7,6 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,9 @@ public class SchemeNavStatsItemReader implements ItemReader<MfSchemeDetailsDto> 
     private boolean noInput = false;
 
     public SchemeNavStatsItemReader(
-            MfSchemeDetailsDto mfSchemeDetails, NamedParameterJdbcTemplate namedParameterJdbcTemplate, String startingYear) {
+            MfSchemeDetailsDto mfSchemeDetails,
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            String startingYear) {
         this.mfSchemeDetails = mfSchemeDetails;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         this.startingYear = startingYear;

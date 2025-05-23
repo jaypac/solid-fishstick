@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.batch.BatchDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.support.JdbcTransactionManager;
 
 @Configuration
 public class DataSourceTestConfiguration {
@@ -23,10 +22,5 @@ public class DataSourceTestConfiguration {
                 .addScript("/db/h2/migration/V4__Insert_mf_fund_house_data.sql")
                 .generateUniqueName(true)
                 .build();
-    }
-
-    @Bean
-    public JdbcTransactionManager transactionManager(DataSource dataSource) {
-        return new JdbcTransactionManager(dataSource);
     }
 }
