@@ -18,7 +18,7 @@ import org.springframework.beans.BeanUtils;
 public class AmfiFileItemProcessor implements ItemProcessor<MfNavDetails, MfNavDetails> {
 
     @Override
-    public MfNavDetails process(MfNavDetails item) throws Exception {
+    public MfNavDetails process(MfNavDetails item) {
 
         MfNavDetails newMfNavDetails = new MfNavDetails();
         newMfNavDetails.setFundHouse(item.getFundHouse());

@@ -34,7 +34,7 @@ public class AmfiFileItemWriter implements ItemWriter<MfNavDetails> {
     @Value("${scheme.details.writer.insert}")
     private String schemeMfNavDetailsInsert;
 
-    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private void convertToEntity(MfNavDetails newMfNavDetails) {
         MfFundHouse mfFundHouse = fundHouseService.getFundHouseByName(newMfNavDetails.getFundHouse());
@@ -60,7 +60,7 @@ public class AmfiFileItemWriter implements ItemWriter<MfNavDetails> {
                 schemeDetails.setSubCategory(SchemeSubCategory.fromName(key.subCategory()));
                 schemeDetails.setFundHouse(mfFundHouse);
             }
-            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getJdbcTemplate())
+            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
                     .withTableName("mf_scheme_details")
                     .usingGeneratedKeyColumns("id");
 
@@ -83,7 +83,7 @@ public class AmfiFileItemWriter implements ItemWriter<MfNavDetails> {
                 entries.add(mapSqlParameterSource);
             }
             MapSqlParameterSource[] array = entries.toArray(new MapSqlParameterSource[entries.size()]);
-            jdbcTemplate.batchUpdate(schemeMfNavDetailsInsert, array);
+            namedParameterJdbcTemplate.batchUpdate(schemeMfNavDetailsInsert, array);
         }
 
         log.info(
